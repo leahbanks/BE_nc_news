@@ -1,9 +1,15 @@
-const {fetchTopics} = require('./app.models');
+const {fetchTopics, fetchArticles} = require('./app.models');
 
 const getTopics = (req, res) => {
-    fetchTopics().then((response) => {
-        res.status(200).send(response)
+    fetchTopics().then((topics) => {
+        res.status(200).send(topics);
     })
 }
 
-module.exports = { getTopics };
+const getArticles = (req, res) => {
+    fetchArticles().then((articles) => {
+        res.status(200).send(articles);
+    })
+}
+
+module.exports = { getTopics, getArticles };
