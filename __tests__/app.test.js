@@ -70,8 +70,7 @@ describe('GET/api/articles', () => {
                 expect(article).toHaveProperty('article_img_url')
                 expect(article).toHaveProperty('comment_count')
             })
-            
-    })
+         })
     })
     it('each article should have the correct comment_count data', () => {
         return request(app).get('/api/articles').then((response) => {
@@ -109,4 +108,45 @@ describe('GET/api/articles/:article_id', () => {
                 expect(body.msg).toBe('Article ID Not Found')
             })
         })
+        it('should return 400 - bad request when passed an ID that is not a number', () => {
+            return request(app).get('/api/articles/notanumber').expect(400).then((response) => {
+                expect(response.body.msg).toBe('Bad Request')
+            });
     })
+})
+
+describe('GET/api/articles/:article_id/comments', () => {
+    it('should return a status of 200', () => {
+        return request(app).get('/api/articles/9/comments').expect(200);
+    })
+    it('should return an array of comments for the given article id with the expected length and properties', () => {
+        return request(app).get('/api/articles/9/comments').expect(200).then((response) => {
+            const comments = response.body;
+            expect(comments).toHaveLength(2);
+            comments.forEach((comment) => {
+                expect(comment).toHaveProperty('comment_id')
+                expect(comment).toHaveProperty('votes')
+                expect(comment).toHaveProperty('created_at')
+                expect(comment).toHaveProperty('author')
+                expect(comment).toHaveProperty('body')
+            })
+        })
+    })
+    it('the comments should be sorted by date (created_at) in descending order', () => {
+        return request(app).get('/api/articles/1/comments').then((response) => {
+        const comments = response.body;
+        expect(comments).toBeSortedBy('created_at',{ descending: true })
+    })
+})
+it('should return 404 - article not found when input an invalid article_id', () => {
+    return request(app).get('/api/articles/7000/comments').expect(404).then(({ body }) => {
+        expect(body.msg).toBe('Article ID Not Found')
+    })
+})
+it('should return 400 - bad request when passed an ID that is not a number', () => {
+    return request(app).get('/api/articles/notanumber/comments').expect(400).then((response) => {
+        expect(response.body.msg).toBe('Bad Request')
+    });
+
+})
+})

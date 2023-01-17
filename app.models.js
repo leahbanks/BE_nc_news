@@ -24,16 +24,27 @@ const fetchArticles = () => {
 
 
 const fetchArticleById = (article_id) => {
-    const queryString = `SELECT * FROM articles WHERE article_id = $1`;
+    if (!/^\d+$/.test(article_id)) {
+        return Promise.reject({status: 400, msg: 'Bad Request'}) 
+    }
+    const queryString = `SELECT * FROM articles WHERE article_id = $1;`
     return db.query(queryString, [article_id]).then((result) => {
         if (result.rows.length === 0) {
             return Promise.reject({ status: 404, msg: 'Article ID Not Found'}) 
-        } else {
-            console.log(result.rows[0])
-            return result.rows[0]
-        }
+        } else return result.rows[0]
             })
-        }
-        
+        };
+
+const fetchCommentsByArticleId = (article_id) => {
+    if (!/^\d+$/.test(article_id)) {
+        return Promise.reject({status: 400, msg: 'Bad Request'}) 
+    }
+    const queryString = `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY created_at DESC`
+    return db.query(queryString, [article_id]).then((result) => {
+        if (result.rows.length === 0) {
+            return Promise.reject({ status: 404, msg: 'Article ID Not Found'}) 
+        } else return result.rows;
+    })
+}
     
-module.exports = { fetchTopics, fetchArticles, fetchArticleById };
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId };
