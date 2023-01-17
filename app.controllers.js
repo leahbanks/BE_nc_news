@@ -1,3 +1,4 @@
+
 const {fetchTopics, fetchArticles, fetchArticleById} = require('./app.models');
 
 const getTopics = (req, res) => {
@@ -11,6 +12,7 @@ const getArticles = (req, res) => {
         res.status(200).send(articles);
     })
 }
+
 
 const getArticleById = (req, res, next) => {
     const {article_id} = req.params;

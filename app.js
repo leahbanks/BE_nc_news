@@ -4,6 +4,7 @@ const app = express()
 const { getTopics, getArticles, getArticleById } = require('./app.controllers')
 app.use(express.json());
 
+
 app.get('/api/topics', getTopics);
 
 app.get('/api/articles', getArticles);
@@ -21,7 +22,6 @@ app.use((err, req, res, next) => {
 app.use((req, res, next) => {
     res.status(404).send({msg: 'Path Not Found'})
 })
-
 
 
 module.exports = app;
