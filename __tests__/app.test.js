@@ -3,6 +3,7 @@ const seed  = require('../db/seeds/seed')
 const app = require('../app')
 const data = require('../db/data/test-data')
 const db = require('../db/connection')
+const sort = require('jest-sorted');
 
 beforeEach(() => {
     return seed(data)
@@ -49,9 +50,10 @@ describe('GET/api/articles', () => {
             expect(Array.isArray(articles)).toBe(true);
         })
     })
-    it('should have the expected properties', () => {
+    it('the array should have the expected length and properties', () => {
         return request(app).get('/api/articles').then((response) => {
             const articles = response.body;
+            expect(articles).toHaveLength(12)
             articles.forEach((article) => {
                 expect(article).toHaveProperty('author')
                 expect(article).toHaveProperty('title')
@@ -65,4 +67,20 @@ describe('GET/api/articles', () => {
             
     })
     })
+    it('each article should have the correct comment_count data', () => {
+        return request(app).get('/api/articles').then((response) => {
+        const articles = response.body;
+        expect(articles[0].comment_count).toBe(2)
+        expect(articles[1].comment_count).toBe(1)
+    })
+    })
+    it('the articles should be sorted by date (created_at) in descending order', () => {
+        return request(app).get('/api/articles').then((response) => {
+        const articles = response.body;
+        expect(articles).toBeSortedBy('created_at',{ descending: true })
+    })
+})
+it('should return a 404 error when an incorrect path is followed', () => {
+    return request(app).get('/api/articles/2')
+})
 })
