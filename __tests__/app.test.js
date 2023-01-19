@@ -231,3 +231,23 @@ describe('Post Comment by Article ID', () => {
          })
     })
 })
+
+    describe('Get Users', () => {
+        describe('GET /api/users', () => {
+            it('should return a status of 200', () => {
+                return request(app).get('/api/users').expect(200);
+            })
+            it('should return an array of user objects with the expected length and properties', () => {
+                return request(app).get('/api/users').expect(200).then(({body}) => {
+                    const users = body;
+                    expect(Array.isArray(users)).toBe(true);
+                    expect(users.length).toBe(4);
+                    users.forEach((user) => {
+                        expect(user).toHaveProperty('username')
+                        expect(user).toHaveProperty('name')
+                        expect(user).toHaveProperty('avatar_url')
+                    })
+                })
+            })
+        })
+    })
