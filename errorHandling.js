@@ -3,7 +3,6 @@ const incorrectPath = ('/*', (req, res) => {
 })
 
 const psqlErrorCodes = (err, req, res, next) => {
-    console.log(err, '<---- test')
     if (err.code === '22P02') {
         res.status(400).send({msg: 'Invalid data type'}) 
     } else {

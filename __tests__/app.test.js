@@ -238,12 +238,14 @@ describe('Patch votes by Article ID', () => {
             const voteIncrease = { inc_votes: 5 }
             return request(app).patch('/api/articles/1').send(voteIncrease).expect(200);
              })
-        it('should return 400 - bad request if request body is empty or required fields are missing', () => {
+        it('should return 400 - bad request if request body is empty', () => {
             return request(app).patch('/api/articles/1').send().expect(400).then(({body}) => {
-                expect(body.msg).toBe('Required field(s) empty');
-            return request(app).patch('/api/articles/1').send({}).expect(400).then(({body}) => {
-                expect(body.msg).toBe('Required field(s) empty');
+                expect(body.msg).toBe('Required field(s) empty')
             })
+        })
+        it('should return 400 - bad request if required properties are missing', () => {
+            return request(app).patch('/api/articles/1').send({votes: 7}).expect(400).then(({body}) => {
+                expect(body.msg).toBe('Required field(s) empty')
         })
     })
         it('should return 400 - bad request if the vaue of inc_votes is not a number', () => {
