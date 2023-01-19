@@ -61,5 +61,11 @@ const updateVotes = (increaseVotes, article_id) => {
   })
 }
 
-    
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, updateVotes };
+const fetchUsers = () => {
+    const queryString = `SELECT * FROM users;`
+    return db.query(queryString).then((users) => {
+        return users.rows;
+    })
+}
+
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, UpdateVotes, fetchUsers };

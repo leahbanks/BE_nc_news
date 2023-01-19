@@ -1,5 +1,7 @@
 
-const {fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, updateVotes} = require('./app.models');
+
+const {fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, updateVotes, fetchUsers} = require('./app.models');
+
 
 const getTopics = (req, res, next) => {
     fetchTopics().then((topics) => {
@@ -46,6 +48,7 @@ const postCommentByArticleId = (req, res, next) => {
     })
 }
 
+
 const patchVotesbyArticleId = (req, res, next) => {
     const {article_id} = req.params;
     const increaseVotes = req.body
@@ -58,4 +61,14 @@ const patchVotesbyArticleId = (req, res, next) => {
 }
 
 
-module.exports = { getTopics, getArticles, getArticleById, getCommentsByArticleId, postCommentByArticleId, patchVotesbyArticleId };
+const getUsers = (req, res, next) => {
+    fetchUsers().then((users) => {
+        res.status(200).send(users)
+    }).catch(err => {
+        next(err)
+    })
+}
+    
+
+
+module.exports = { getTopics, getArticles, getArticleById, getCommentsByArticleId, postCommentByArticleId, patchVotesbyArticleId, getUsers };
