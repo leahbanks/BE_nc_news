@@ -28,28 +28,39 @@ const fetchArticleById = (article_id) => {
     return db.query(queryString, [article_id]).then((result) => {
         if (result.rows.length === 0) {
             return Promise.reject({ status: 404, msg: 'Article ID Not Found'})
-        } 
-        return result.rows[0]
-            })
-        };
+        }
+            return result.rows[0]
+         })
+    }
 
 const fetchCommentsByArticleId = (article_id) => {
-    const queryString = `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY created_at DESC;`
+   return fetchArticleById(article_id).then(() => {
+    const queryString = `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY created_at DESC`
     return db.query(queryString, [article_id]).then((result) => {
        return result.rows;
     })
+})
 }
 
 const addNewComment = (newComment, article_id) => {
-    if (newComment.body) {
+    return fetchArticleById(article_id).then(() => {
         const queryString = `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *;`
         return db.query(queryString, [newComment.username, newComment.body, article_id]).then((result) => {
             return result.rows[0];
           })
-        } else {
-            return Promise.reject({status: 400, msg: 'Required field(s) empty'})  }
+        })
         }
     
+    
+const updateVotes = (increaseVotes, article_id) => {
+    return fetchArticleById(article_id).then(() => {
+    const queryString = `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`
+    return db.query(queryString, [increaseVotes.inc_votes, article_id]).then((result) => {
+        return result.rows[0];
+     }) 
+  })
+}
+
 const fetchUsers = () => {
     const queryString = `SELECT * FROM users;`
     return db.query(queryString).then((users) => {
@@ -57,4 +68,4 @@ const fetchUsers = () => {
     })
 }
 
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, fetchUsers };
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, UpdateVotes, fetchUsers };
