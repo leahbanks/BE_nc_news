@@ -34,7 +34,7 @@ const fetchArticleById = (article_id) => {
         };
 
 const fetchCommentsByArticleId = (article_id) => {
-    const queryString = `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY created_at DESC`
+    const queryString = `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY created_at DESC;`
     return db.query(queryString, [article_id]).then((result) => {
        return result.rows;
     })
@@ -50,5 +50,11 @@ const addNewComment = (newComment, article_id) => {
             return Promise.reject({status: 400, msg: 'Required field(s) empty'})  }
         }
     
-    
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment };
+const fetchUsers = () => {
+    const queryString = `SELECT * FROM users;`
+    return db.query(queryString).then((users) => {
+        return users.rows;
+    })
+}
+
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, fetchUsers };
