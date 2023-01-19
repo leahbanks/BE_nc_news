@@ -24,27 +24,31 @@ const fetchArticles = () => {
 
 
 const fetchArticleById = (article_id) => {
-    if (!/^\d+$/.test(article_id)) {
-        return Promise.reject({status: 400, msg: 'Bad Request'}) 
-    }
     const queryString = `SELECT * FROM articles WHERE article_id = $1;`
     return db.query(queryString, [article_id]).then((result) => {
         if (result.rows.length === 0) {
-            return Promise.reject({ status: 404, msg: 'Article ID Not Found'}) 
-        } else return result.rows[0]
+            return Promise.reject({ status: 404, msg: 'Article ID Not Found'})
+        } 
+        return result.rows[0]
             })
         };
 
 const fetchCommentsByArticleId = (article_id) => {
-    if (!/^\d+$/.test(article_id)) {
-        return Promise.reject({status: 400, msg: 'Bad Request'}) 
-    }
     const queryString = `SELECT * FROM comments WHERE comments.article_id = $1 ORDER BY created_at DESC`
     return db.query(queryString, [article_id]).then((result) => {
-        if (result.rows.length === 0) {
-            return Promise.reject({ status: 404, msg: 'Article ID Not Found'}) 
-        } else return result.rows;
+       return result.rows;
     })
 }
+
+const addNewComment = (newComment, article_id) => {
+    if (newComment.body) {
+        const queryString = `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *;`
+        return db.query(queryString, [newComment.username, newComment.body, article_id]).then((result) => {
+            return result.rows[0];
+          })
+        } else {
+            return Promise.reject({status: 400, msg: 'Required field(s) empty'})  }
+        }
     
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId };
+    
+module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment };
