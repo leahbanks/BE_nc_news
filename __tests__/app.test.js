@@ -114,7 +114,7 @@ describe('Get Articles by Article ID', () => {
          })
             it('should return 400 - bad request when passed an ID that is not a number', () => {
                 return request(app).get('/api/articles/notanumber').expect(400).then((response) => {
-                    expect(response.body.msg).toBe('Article ID must be a number')
+                    expect(response.body.msg).toBe('Invalid data type')
             });
         })
     })
@@ -151,7 +151,7 @@ describe('Get Comments by Article ID', () => {
 })  
         it('should return 400 - bad request when passed an ID that is not a number', () => {
             return request(app).get('/api/articles/notanumber/comments').expect(400).then((response) => {
-                expect(response.body.msg).toBe('Article ID must be a number')
+                expect(response.body.msg).toBe('Invalid data type')
             });
         })
     })
@@ -201,7 +201,7 @@ describe('Post Comment by Article ID', () => {
                 body: 'I love this article!',
             }
             return request(app).post('/api/articles/notanumber/comments').send(newComment).expect(400).then(({body}) => {
-                expect(body.msg).toBe('Article ID must be a number')
+                expect(body.msg).toBe('Invalid data type')
         });
     })
         it('should return 400 - bad request if missing required fields', () => {
@@ -229,5 +229,66 @@ describe('Post Comment by Article ID', () => {
                 expect(body.msg).toBe('Username does not exist')
             })
          })
+    })
+})
+
+describe('Patch votes by Article ID', () => {
+    describe('PATCH/api/articles/:article_id', () => {
+        it('should return a status of 200', () => {
+            const voteIncrease = { inc_votes: 5 }
+            return request(app).patch('/api/articles/1').send(voteIncrease).expect(200);
+             })
+        it('should return 400 - bad request if request body is empty or required fields are missing', () => {
+            return request(app).patch('/api/articles/1').send().expect(400).then(({body}) => {
+                expect(body.msg).toBe('Required field(s) empty');
+            return request(app).patch('/api/articles/1').send({}).expect(400).then(({body}) => {
+                expect(body.msg).toBe('Required field(s) empty');
+            })
+        })
+    })
+        it('should return 400 - bad request if the vaue of inc_votes is not a number', () => {
+            return request(app).patch('/api/articles/1').send({inc_votes: 'notanumber'}).expect(400).then(({body}) => {
+                expect(body.msg).toBe('Invalid data type')
+            })
+        })
+        it('should return 400 - bad request when passed an ID that is not a number', () => {
+            return request(app).patch('/api/articles/notanumber').send({ inc_votes: 5 }).expect(400).then(({body}) => {
+                expect(body.msg).toBe("Invalid data type")
+        })
+    })
+        it('should return 404 - article not found when input an article_id that does not exist', () => {
+            return request(app).patch('/api/articles/7000').send({ inc_votes: 5 }).expect(404).then(({body}) => {
+            expect(body.msg).toBe("Article ID Not Found")
+        })
+    })
+        it('should update the votes on the given article by the given amount', () => {
+            const voteIncrease = { inc_votes: 5 }
+            return request(app).patch('/api/articles/1').send(voteIncrease).expect(200).then(({body}) => {
+            const updatedArticle = body
+            expect(updatedArticle.article_id).toBe(1)
+            expect(updatedArticle.votes).toBe(105)
+
+            const voteDecrease = { inc_votes: -20 }
+            return request(app).patch('/api/articles/7').send(voteDecrease).expect(200).then(({body}) => {
+            const updatedArticle2 = body
+            expect(updatedArticle2.article_id).toBe(7)
+            expect(updatedArticle2.votes).toBe(-20)
+         })
+        })
+    })
+        it('should return the updated article object', () => {
+            const voteIncrease = { inc_votes: 29 }
+            return request(app).patch('/api/articles/1').send(voteIncrease).expect(200).then(({body}) => {
+            const updatedArticle = body
+            expect(updatedArticle.article_id).toBe(1)
+            expect(updatedArticle.votes).toBe(129)
+            expect(updatedArticle).toHaveProperty('title')
+            expect(updatedArticle).toHaveProperty('topic')
+            expect(updatedArticle).toHaveProperty('author')
+            expect(updatedArticle).toHaveProperty('body')
+            expect(updatedArticle).toHaveProperty('created_at')
+            expect(updatedArticle).toHaveProperty('article_img_url')
+        })
+    })
     })
 })
