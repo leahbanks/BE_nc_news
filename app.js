@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const { getTopics, getArticles, getArticleById, getCommentsByArticleId, postCommentByArticleId, patchVotesbyArticleId, getUsers } = require('./app.controllers')
+const { getTopics, getArticles, getArticleById, getCommentsByArticleId, postCommentByArticleId, patchVotesbyArticleId, getUsers, getAPI } = require('./app.controllers')
 const {incorrectPath, customErrors, serverErrors, psqlErrorCodes} = require('./errorHandling')
 app.use(express.json());
 
@@ -17,6 +17,8 @@ app.post('/api/articles/:article_id/comments', postCommentByArticleId)
 app.patch('/api/articles/:article_id', patchVotesbyArticleId)
 
 app.get('/api/users', getUsers)
+
+app.get('/api', getAPI)
 
 app.use(incorrectPath);
 app.use(customErrors);

@@ -421,3 +421,24 @@ describe('Patch votes by Article ID', () => {
         })
     })
 
+    describe('Get API endpoints', () => {
+        describe('GET /api', () => {
+            it('should return a status of 200', () => {
+                return request(app).get('/api').expect(200);
+            })
+            it('should return a JSON object with the expected properties', () => {
+                return request(app).get('/api').expect(200).then(({body}) => {
+                    const endPoints = body.endPoints
+                    expect(typeof endPoints).toBe('object')
+                    expect(endPoints).toHaveProperty('GET /api')
+                    expect(endPoints).toHaveProperty('GET /api/topics')
+                    expect(endPoints).toHaveProperty('GET /api/articles')
+                    expect(endPoints).toHaveProperty('GET /api/articles/:article_id')
+                    expect(endPoints).toHaveProperty('GET /api/articles/:article_id/comments')
+                    expect(endPoints).toHaveProperty('POST /api/articles/:article_id')
+                    expect(endPoints).toHaveProperty('PATCH /api/articles/:article_id')
+                    expect(endPoints).toHaveProperty('GET /api/users')
+                })
+            })
+        })
+    })
