@@ -18,7 +18,7 @@ describe('API', () => {
         return request(app).get('/api/not-a-path').expect(404).then(({ body }) => {
             expect(body.msg).toBe('Path Not Found');
         })
-    })
+    });
 
 describe('Get Topics', () => {
     describe('GET/api/topics', () => {
