@@ -19,7 +19,7 @@ describe('API', () => {
             expect(body.msg).toBe('Path Not Found');
         })
     })
-})
+
 describe('Get Topics', () => {
     describe('GET/api/topics', () => {
         it('should return a status of 200', () => {
@@ -420,4 +420,39 @@ describe('Patch votes by Article ID', () => {
             })
         })
     })
+
+    describe('Delete comments by comment_id', () => {
+        describe('DELETE/api/comments/:comment_id', () => {
+            it('should return a status of 204', () => {
+                return request(app).delete('/api/comments/1').expect(204);
+            })
+            it('should return no content', () => {
+                return request(app).delete('/api/comments/1').expect(204).then(({body}) => {
+                    expect(body).toEqual({})
+                })
+            })
+            it('should delete the given comment from the comments table', () => {
+                return request(app).delete('/api/comments/1').expect(204).then(() => {
+                    return request(app).get('/api/articles/9/comments').then(({body}) => {
+                        const comments = body;
+                        expect(comments.length).toBe(1)
+                        comments.forEach((comment) => {
+                            expect(comment.comment_id).not.toBe(1)
+                        })
+                    })
+                })
+            })
+            it('should return 404 - not found when passed a comment_id that does not exist', () => {
+                return request(app).delete('/api/comments/10000').expect(404).then(({body}) => {
+                    expect(body.msg).toBe('Comment not found')
+                })
+            })
+            it('should return 400 - bad request when passed a comment_id that is not a number', () => {
+                return request(app).delete('/api/comments/notanumber').expect(400).then(({body}) => {
+                    expect(body.msg).toBe('Invalid data type')
+            })
+         })
+    })
+})
+})
 
