@@ -53,14 +53,14 @@ describe('Get Articles', () =>{
             .expect(200);
     })
         it('should return an array', () => {
-            return request(app).get('/api/articles').then((response) => {
-                const articles = response.body;
+            return request(app).get('/api/articles').then(({body}) => {
+                const articles = body.articles;
                 expect(Array.isArray(articles)).toBe(true);
          })
     })
         it('the array should have the expected length and properties', () => {
-            return request(app).get('/api/articles').then((response) => {
-                const articles = response.body;
+            return request(app).get('/api/articles').then(({body}) => {
+                const articles = body.articles;
                 expect(articles).toHaveLength(12)
                 articles.forEach((article) => {
                     expect(article).toHaveProperty('author')
@@ -75,20 +75,113 @@ describe('Get Articles', () =>{
         })
     })
         it('each article should have the correct comment_count data', () => {
-            return request(app).get('/api/articles').then((response) => {
-            const articles = response.body;
+            return request(app).get('/api/articles').then(({body}) => {
+            const articles = body.articles;
             expect(articles[0].comment_count).toBe(2)
             expect(articles[1].comment_count).toBe(1)
         })
     })
         it('the articles should be sorted by date (created_at) in descending order', () => {
-            return request(app).get('/api/articles').then((response) => {
-                const articles = response.body;
+            return request(app).get('/api/articles').then(({body}) => {
+                const articles = body.articles;
                 expect(articles).toBeSortedBy('created_at',{ descending: true })
              })
          })
     })
+
+describe('Get Articles (queries)', () => {
+    describe('Filter Articles by topic', () => {
+        it('should return all articles that match the queried topic', () => {
+            return request(app).get('/api/articles?topic=mitch').expect(200).then(({body}) => {
+                const articles = body.articles;
+                expect(articles.length).toBe(11)
+                articles.forEach((article) => {
+                    expect(article.topic).toBe('mitch');
+                })
+              })
+            })
+        it('should return 404 - bad request when queried with a topic that does not exist', () => {
+            return request(app).get('/api/articles?topic=notatopic').expect(404).then(({body}) => {
+                    expect(body.msg).toBe('Topic not found');
+                 })
+            })
+        it('should respond with all articles if the query is omitted', () => {
+            return request(app).get('/api/articles?topic=').expect(200).then(({body}) => {
+                const articles = body.articles;
+                    expect(articles.length).toBe(12);
+                 })
+            })
+        })
+    })
+    describe('Sort Articles', () => {
+        it('should sort articles by title and default to descending order', () => {
+            return request(app).get('/api/articles?sort_by=title').expect(200).then(({body}) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('title', { descending: true })
+            })
+        })
+        it('should sort articles by article_id and default to descending order', () => {
+            return request(app).get('/api/articles?sort_by=article_id').expect(200).then(({body}) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('article_id', { descending: true })
+            })
+        })
+        it('should sort articles by comment_count and default to descending order', () => {
+            return request(app).get('/api/articles?sort_by=comment_count').expect(200).then(({body}) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('comment_count', { descending: true })
+            })
+        })
+        it('should sort articles by author and default to descending order', () => {
+            return request(app).get('/api/articles?sort_by=author').expect(200).then(({body}) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('author', { descending: true })
+            })
+        })
+        it('should sort articles by votes and default to descending order', () => {
+            return request(app).get('/api/articles?sort_by=votes').expect(200).then(({body}) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('votes', { descending: true })
+            })
+        })
+        it('should sort articles by title and default to descending order', () => {
+            return request(app).get('/api/articles?sort_by=title').expect(200).then(({body}) => {
+                const articles = body.articles;
+                expect(articles).toBeSortedBy('title', { descending: true })
+            })
+        })
+        it('should return 404 - not found when sorted by a column that does not exist', () => {
+            return request(app).get('/api/articles?sort_by=notacolumn').expect(404).then(({body}) => {
+                expect(body.msg).toBe('Column does not exist');
+        })
+    })
+    it('should default to sorting by created_at when a column is not specified', () => {
+        return request(app).get('/api/articles').expect(200).then(({body}) => {
+            const articles = body.articles;
+                expect(articles).toBeSortedBy('created_at',{ descending: true })
+             })
+        })
+    })
 })
+    describe('Order Articles', () => {
+        it('should return articles sorted by created_at in descending order by default', () => {
+            return request(app).get('/api/articles').expect(200).then(({body}) => {
+                const articles = body.articles;
+                    expect(articles).toBeSortedBy('created_at', { descending: true })
+                 })
+            })
+            it('should return articles in ascending order when ASC is added to the query', () => {
+                return request(app).get('/api/articles?order=ASC').expect(200).then(({body}) => {
+                    const articles = body.articles;
+                        expect(articles).toBeSortedBy('created_at', { ascending: true })
+                })
+            })
+            it('should return 400 - bad request when query is not ASC or DESC', () => {
+                return request(app).get('/api/articles?order=abc').expect(400).then(({body}) => {
+                    expect(body.msg).toBe('Invalid query')
+                })
+            })
+        })
 
 describe('Get Articles by Article ID', () => {
     describe('GET/api/articles/:article_id', () => {
@@ -242,8 +335,8 @@ describe('Patch votes by Article ID', () => {
         it('should return 400 - bad request if request body is empty', () => {
             return request(app).patch('/api/articles/1').send().expect(400).then(({body}) => {
                 expect(body.msg).toBe('Required field(s) empty')
-            })
         })
+    })
         it('should return 400 - bad request if required properties are missing', () => {
             return request(app).patch('/api/articles/1').send({votes: 7}).expect(400).then(({body}) => {
                 expect(body.msg).toBe('Required field(s) empty')
@@ -252,8 +345,8 @@ describe('Patch votes by Article ID', () => {
         it('should return 400 - bad request if the vaue of inc_votes is not a number', () => {
             return request(app).patch('/api/articles/1').send({inc_votes: 'notanumber'}).expect(400).then(({body}) => {
                 expect(body.msg).toBe('Invalid data type')
-            })
         })
+    })
         it('should return 400 - bad request when passed an ID that is not a number', () => {
             return request(app).patch('/api/articles/notanumber').send({ inc_votes: 5 }).expect(400).then(({body}) => {
                 expect(body.msg).toBe("Invalid data type")
@@ -277,22 +370,22 @@ describe('Patch votes by Article ID', () => {
             expect(updatedArticle2.article_id).toBe(7)
             expect(updatedArticle2.votes).toBe(-20)
          })
-        })
     })
+})
         it('should return the updated article object', () => {
             const voteIncrease = { inc_votes: 29 }
             return request(app).patch('/api/articles/1').send(voteIncrease).expect(200).then(({body}) => {
             const updatedArticle = body
-            expect(updatedArticle.article_id).toBe(1)
-            expect(updatedArticle.votes).toBe(129)
-            expect(updatedArticle).toHaveProperty('title')
-            expect(updatedArticle).toHaveProperty('topic')
-            expect(updatedArticle).toHaveProperty('author')
-            expect(updatedArticle).toHaveProperty('body')
-            expect(updatedArticle).toHaveProperty('created_at')
-            expect(updatedArticle).toHaveProperty('article_img_url')
+                expect(updatedArticle.article_id).toBe(1)
+                expect(updatedArticle.votes).toBe(129)
+                expect(updatedArticle).toHaveProperty('title')
+                expect(updatedArticle).toHaveProperty('topic')
+                expect(updatedArticle).toHaveProperty('author')
+                expect(updatedArticle).toHaveProperty('body')
+                expect(updatedArticle).toHaveProperty('created_at')
+                expect(updatedArticle).toHaveProperty('article_img_url')
+            })
         })
-    })
     })
 })
 

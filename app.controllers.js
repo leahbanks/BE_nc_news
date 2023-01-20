@@ -1,6 +1,4 @@
-
-
-const {fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, updateVotes, fetchUsers} = require('./app.models');
+const {fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, updateVotes, fetchUsers, fetchTopicsByName} = require('./app.models');
 
 
 const getTopics = (req, res, next) => {
@@ -12,12 +10,25 @@ const getTopics = (req, res, next) => {
     }
 
 const getArticles = (req, res, next) => {
-    fetchArticles().then((articles) => {
-        res.status(200).send(articles);
-    }).catch(err => {
-        next(err);
-    })
+    const {topic, sort_by, order} = req.query;
+    if (topic) {
+        fetchTopicsByName(topic).then(() => {
+            fetchArticles(topic, sort_by, order).then((articles) => {
+                res.status(200).send({articles})
+            })
+        }).catch(err => {
+            console.log
+            next(err);
+        })
+    } else {
+        fetchArticles(topic, sort_by, order).then((articles) => {
+            res.status(200).send({articles});
+        }).catch(err => {
+            next(err);
+        })
     }
+}
+
 
 const getArticleById = (req, res, next) => {
     const {article_id} = req.params;
@@ -40,7 +51,6 @@ const getCommentsByArticleId = (req, res, next) => {
 const postCommentByArticleId = (req, res, next) => {
     const newComment = req.body;
     const {article_id} = req.params;
-    
     addNewComment(newComment, article_id).then((comment) => {
         res.status(201).send(comment);
     }).catch(err => {
@@ -52,8 +62,7 @@ const postCommentByArticleId = (req, res, next) => {
 const patchVotesbyArticleId = (req, res, next) => {
     const {article_id} = req.params;
     const increaseVotes = req.body
-
-  updateVotes(increaseVotes, article_id).then((updatedVotes) => {
+    updateVotes(increaseVotes, article_id).then((updatedVotes) => {
         res.status(200).send(updatedVotes)
     }).catch(err => {
         next(err);
@@ -67,7 +76,7 @@ const getUsers = (req, res, next) => {
     }).catch(err => {
         next(err)
     })
-}
+};
     
 
 
