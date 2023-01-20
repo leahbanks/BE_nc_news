@@ -1,30 +1,18 @@
 const express = require('express')
 const app = express()
-
-const { getTopics, getArticles, getArticleById, getCommentsByArticleId, postCommentByArticleId, patchVotesbyArticleId, getUsers, deleteCommentsByCommentId, getAPI } = require('./app.controllers')
-
+const { getTopics, getArticles, getArticleById, getCommentsByArticleId, postCommentByArticleId, patchVotesbyArticleId, getUsers, deleteCommentByCommentId, getAPI } = require('./app.controllers')
 const {incorrectPath, customErrors, serverErrors, psqlErrorCodes} = require('./errorHandling')
 app.use(express.json());
 
 app.get('/api/topics', getTopics);
-
 app.get('/api/articles', getArticles);
-
 app.get('/api/articles/:article_id', getArticleById)
-
 app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
-
 app.post('/api/articles/:article_id/comments', postCommentByArticleId)
-
 app.patch('/api/articles/:article_id', patchVotesbyArticleId)
-
 app.get('/api/users', getUsers)
-
-
+app.delete('/api/comments/:comment_id', deleteCommentByCommentId)
 app.get('/api', getAPI)
-
-app.delete('/api/comments/:comment_id', deleteCommentsByCommentId)
-
 
 app.use(incorrectPath);
 app.use(customErrors);
