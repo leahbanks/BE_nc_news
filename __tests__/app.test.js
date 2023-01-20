@@ -424,6 +424,9 @@ describe('Patch votes by Article ID', () => {
                     return request(app).get('/api/articles/9/comments').then(({body}) => {
                         const comments = body;
                         expect(comments.length).toBe(1)
+                        comments.forEach((comment) => {
+                            expect(comment.comment_id).not.toBe(1)
+                        })
                     })
                 })
             })
