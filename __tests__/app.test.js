@@ -211,6 +211,18 @@ describe('Get Articles by Article ID', () => {
             });
         })
     })
+    describe('GET/api/articles/:article_id (comments)', () => {
+        it('an article response object should now include a comment_count property', () => {
+            return request(app).get('/api/articles/1').expect(200).then(({body: {article}}) => {
+                expect(article).toHaveProperty('comment_count')
+            })
+        })
+        it('the comment_count property should represent the total count of all the comments with this article_id', () => {
+            return request(app).get('/api/articles/1').expect(200).then(({body: {article}}) => {
+                expect(article.comment_count).toBe(11)
+            })
+        })
+    })
 })
 
 describe('Get Comments by Article ID', () => {
