@@ -1,5 +1,6 @@
-const {fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, updateVotes, fetchUsers, fetchTopicsByName, removeComment, fetchCommentsByCommentId} = require('./app.models');
 
+const endPoints = require('./endpoints.json')
+const {fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, updateVotes, fetchUsers, fetchTopicsByName, removeComment, fetchCommentsByCommentId} = require('./app.models');
 
 const getTopics = (req, res, next) => {
     fetchTopics().then((topics) => {
@@ -77,6 +78,9 @@ const getUsers = (req, res, next) => {
     })
 };
 
+const getAPI = (req, res, next) => {
+    res.status(200).send({endPoints})
+
 const deleteCommentsByCommentId = (req, res, next) => {
     const {comment_id} = req.params;
     fetchCommentsByCommentId(comment_id).then(() => {
@@ -86,8 +90,11 @@ const deleteCommentsByCommentId = (req, res, next) => {
     }).catch(err => {
         next(err)
     })
+
 }
     
 
 
-module.exports = { getTopics, getArticles, getArticleById, getCommentsByArticleId, postCommentByArticleId, patchVotesbyArticleId, getUsers, deleteCommentsByCommentId };
+
+module.exports = { getTopics, getArticles, getArticleById, getCommentsByArticleId, postCommentByArticleId, patchVotesbyArticleId, getUsers, deleteCommentsByCommentId, getAPI };
+
