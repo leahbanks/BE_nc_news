@@ -7,26 +7,51 @@ const fetchTopics = () => {
 })
 };
 
-const fetchArticles = () => {
-    const queryString = 
+const fetchTopicsByName = (topic) => {
+    const queryString = `SELECT * FROM topics WHERE slug = $1`
+    return db.query(queryString, [topic]).then((topics) => {
+        if (topics.rowCount === 0) {
+            return Promise.reject({status: 404, msg: 'Topic not found'})
+        }
+        return topics.rows;
+    })
+}
+
+const fetchArticles = (topic, sort_by = 'created_at', order = 'DESC') => {
+    let queryValues = [];
+    const sortBy = ['created_at', 'article_id', 'comment_count', 'author', 'votes', 'title']
+    const orderBy = ['ASC', 'DESC']
+
+    let queryString = 
     `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url,
     COUNT (comments.article_id)::INT AS comment_count
     FROM articles
     LEFT JOIN comments ON articles.article_id = comments.article_id
-    GROUP BY articles.article_id
-    ORDER BY created_at DESC;`
+    `
 
-    return db.query(queryString)
-    .then((articles) => {
-        return articles.rows;
+    if (topic) {
+        queryValues.push(topic)
+        queryString += ` WHERE articles.topic = $1`
+    }
+
+    queryString += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`
+     
+    if (!sortBy.includes(sort_by)) {
+        return Promise.reject({status: 404, msg: 'Column does not exist'})
+    }
+    if (!orderBy.includes(order)) {
+        return Promise.reject({status: 400, msg: 'Invalid query'})
+     }
+
+    return db.query(queryString, queryValues).then((response) => {
+        return response.rows;
     })
 }
-
 
 const fetchArticleById = (article_id) => {
     const queryString = `SELECT * FROM articles WHERE article_id = $1;`
     return db.query(queryString, [article_id]).then((result) => {
-        if (result.rows.length === 0) {
+        if (result.rowCount === 0) {
             return Promise.reject({ status: 404, msg: 'Article ID Not Found'})
         }
             return result.rows[0]
@@ -68,4 +93,4 @@ const fetchUsers = () => {
     })
 }
 
-module.exports = { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, UpdateVotes, fetchUsers };
+module.exports = { fetchTopics, fetchTopicsByName, fetchArticles, fetchArticleById, fetchCommentsByArticleId, addNewComment, updateVotes, fetchUsers };
