@@ -3,7 +3,10 @@ const app = express()
 const { getTopics, getArticles, getArticleById, getCommentsByArticleId, postCommentByArticleId, patchVotesbyArticleId, getUsers, deleteCommentByCommentId, getAPI } = require('./app.controllers')
 const {incorrectPath, customErrors, serverErrors, psqlErrorCodes} = require('./errorHandling')
 app.use(express.json());
+const cors = require('cors');
 
+
+app.use(cors());
 app.get('/api/topics', getTopics);
 app.get('/api/articles', getArticles);
 app.get('/api/articles/:article_id', getArticleById)
