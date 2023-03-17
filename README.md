@@ -35,8 +35,8 @@ You can refer to the .env-example file to see how the files should look, however
 
 2. Run the following commands in your terminal to seed the local database:
 
-`npm run setup-dbs`
-`npm run seed`
+* `npm run setup-dbs`
+* `npm run seed`
 
 3. Start the server using `npm start`. You can make requests using your browser or install an application such as Insomnia.
 
