@@ -1,57 +1,45 @@
-# Northcoders News API
+# NC News API
 
-## Background
+## 📝 Description
 
-We will be building an API for the purpose of accessing application data programmatically. The intention here is to mimic the building of a real world backend service (such as reddit) which should provide this information to the front end architecture.
+NC News API is a RESTful API built using Javascript, Node.js, PostgreSQL and Express.js. It has been designed to provide the functionality behind and interactive web application, which will as a Reddit-style news aggregation and comments board. 
 
-Your database will be PSQL, and you will interact with it using [node-postgres](https://node-postgres.com/).
+## End Points
 
-## Kanban
+* `GET` users can access all topics, articles and comments.
+* `POST` users can post a comment on article.
+* `DELETE` users can delete their own comments.
+* `PATCH` users can up-vote or down-vote on an article.
 
-### Link to your Trello Board here: https://trello.com/b/7yiHe1nI
+## ⌨️ Getting Started
 
-To keep track of the tasks involved in this project we're going to use a kanban board. Ensure that you work on one _ticket_ at time. You can click on the ticket to find out more information about what is required for the feature. A ticket is not considered complete unless both the happy path and errors response are handled. You can make use of the checklist on each ticket to keep track of the errors you want to handle. You can also make use of [error-handling.md](error-handling.md) to consider the error codes we may wish to respond with.
+In order to run this project locally, the following must be installed on your machine:
 
-**Please ensure you work through the tickets in numerical order.**
+* Node.js v19.6.1 - Node Package Manager (npm)
+* PostgreSQL v12.12 
+* git (and a Github account)
 
-## Git Branching and Pull Requests
+1. Fork this repository.
+2. Via your terminal, navigate to your desired directory or create a new directory using `mkdir <project-name>`. 
+3. Clone your forked version of the repository to your local machine using the command `git clone <repo-url>`.
+3. Naviagte into your new directory using `cd <project-name>` and open it with your chosen software, e.g. using the command `code .` to open it in VSCode.
+4. In your terminal, run `npm install` to install the required dependencies.
 
-You will be working on each ticket on a new **branch**.
+## 💻 Run Locally
 
-To create and switch to a new git branch use the command:
+1. You will need to create 2 .env files in the main directory, with the following names and contents to connect the databases:
 
-```
-git checkout -b <new branch name>
-```
+* .env.development - this file should contain PGDATABASE=nc_news
+* .env.test - this file should containe PGDATABASE=nc_news_test
+You can refer to the .env-example file to see how the files should look, however in each file you can copy and paste the relevant text below.
 
-This will create a branch and move over to that branch. (Omit the `-b` flag if you wish to switch to an already existing branch).
+2. Run the following commands in your terminal to seed the local database:
 
-We recommend that you name the branch after the number assigned to each ticket via the header. eg. `ncnews-1`
+`npm run setup-dbs`
+`npm run seed`
 
-When pushing the branch to git hub ensure that you make reference to the branch you are pushing to on the remote.
+3. Start the server using `npm start`. You can make requests using your browser or install an application such as Insomnia.
 
-```
-git push origin <branch name>
-```
+4. Run the tests using the command `npm test`.
 
-From github you can make a pull request and share the link and ticket number via a pull request specific nchelp using the command `nchelp pr`. A tutor will swing by to review your code. Ensure that you keep your trello up to date whilst you await the PR approval. Regular `nchelp` will be available for when you need support.
-
-Once a pull request been accepted be sure to switch back to the main branch and pull down the updated changes.
-
-```
-git checkout main
-
-git pull origin main
-```
-
-You can tidy up your local branches once they have been pull into main by deleting them:
-
-```
-git branch -D <local branch>
-```
-
-## Husky
-
-To ensure we are not commiting broken code this project makes use of git hooks. Git hooks are scripts triggered during certain events in the git lifecycle. Husky is a popular package which allows us to set up and maintain these scripts. This project makes use a _pre-commit hook_. When we attempt to commit our work, the script defined in the `pre-commit` file will run. If any of our tests fail than the commit will be aborted.
-
-The [Husky documentation](https://typicode.github.io/husky/#/) explains how to configure Husky for your own project as well as creating your own custom hooks.\_
+Happy hacking!
