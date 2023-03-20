@@ -31,7 +31,6 @@ In order to run this project locally, the following must be installed on your ma
 
 * .env.development - this file should contain PGDATABASE=nc_news
 * .env.test - this file should containe PGDATABASE=nc_news_test
-You can refer to the .env-example file to see how the files should look, however in each file you can copy and paste the relevant text below.
 
 2. Run the following commands in your terminal to seed the local database:
 
