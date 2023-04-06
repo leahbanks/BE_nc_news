@@ -4,6 +4,8 @@
 
 NC News API is a RESTful API built using Javascript, Node.js, PostgreSQL and Express.js. It has been designed to provide the functionality behind and interactive web application, which will serve as a Reddit-style news aggregation and comments board. 
 
+The API is hosted via Render and can be viewed [here](https://nc-news-81lq.onrender.com/api).
+
 ## End Points
 
 * `GET` users can access all topics, articles and comments.
